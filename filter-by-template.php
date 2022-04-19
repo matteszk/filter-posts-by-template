@@ -19,20 +19,32 @@ class FilterByTemplate {
 	public function __construct()
 	{
 		$this->post_type = isset( $_GET[ 'post_type' ] ) ? $_GET[ 'post_type' ] : 'all'; 
-
-		add_action( 'restrict_manage_posts', array( $this, 'filter_dropdown' ) );
-		add_filter( 'request', array( $this, 'filter_post_list' ) );
-		
-		add_filter("manage_{$this->post_type}_posts_columns", array( $this, 'post_list_columns_head' ) );
-		add_action("manage_{$this->post_type}_posts_custom_column", array( $this, 'post_list_columns_content' ), 10, 2);
-
-		add_action( 'init', array( $this , 'load_textdomain' ) );
+	
+		add_filter( 'admin_init', array( $this , 'init' ) );
 	}
 	
 
+	public function init() {
+
+		//if there are no templates listed for this post type, end plugin initiation
+		if( count( get_page_templates( null, $this->post_type ) ) == 0 )
+		{
+			return;
+		}
+			
+		add_action( 'restrict_manage_posts', array( $this, 'filter_dropdown' ) );
+		add_filter( 'request', array( $this, 'filter_post_list' ) );
+		
+		add_filter( "manage_{$this->post_type}_posts_columns", array( $this, 'post_list_columns_head' ) );
+		add_action( "manage_{$this->post_type}_posts_custom_column", array( $this, 'post_list_columns_content' ), 10, 2);
+
+		add_action( 'init', array( $this , 'load_textdomain' ) );
+	}
+
+
 	public function filter_dropdown()
-	{
-		if ( $GLOBALS['pagenow'] === 'upload.php' )
+	{		
+		if( $GLOBALS['pagenow'] === 'upload.php' )
 		{
 			return;
 		}
@@ -53,20 +65,20 @@ class FilterByTemplate {
 
 	public function filter_post_list( $vars )
 	{
-		if ( ! isset( $_GET['page_template_filter'] ) )
+		if( ! isset( $_GET['page_template_filter'] ) )
 		{
 			 return $vars;
 		}
 		
 		$template = trim( $_GET['page_template_filter']);
 
-		$data = get_option("filter_page_by_template_data", array() );
+		$data = get_option( "filter_page_by_template_data", array() );
 		$filter_used = isset( $data['filter_used'] ) ? intval( $data['filter_used'] ) : 0;
 		$filter_used ++;
 	    $data['filter_used'] = $filter_used;
-	    update_option("filter_page_by_template_data", $data );
+	    update_option( "filter_page_by_template_data", $data );
 
-		if ( $template == '' || $template == 'all' )
+		if( $template == '' || $template == 'all' )
 		{
 			 return $vars;
 		}
@@ -109,7 +121,6 @@ class FilterByTemplate {
 	}
 
 
-	# Add new column to post list
 	public function post_list_columns_head( $columns )
 	{
 	    $columns['template'] = 'Template';
@@ -117,7 +128,6 @@ class FilterByTemplate {
 	} 
 
 
-	#post list column content
 	public function post_list_columns_content( $column_name, $post_id )
 	{
 	    if( $column_name == 'template' )
@@ -156,10 +166,8 @@ class FilterByTemplate {
 	public function load_textdomain()
 	{
 		load_plugin_textdomain( 'filter-page-by-template', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-	}
-	
-	
-}//end class
+	}	
+}
 
 if( is_admin() )
 {
