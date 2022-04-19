@@ -3,8 +3,8 @@
  * Plugin Name: Filter by Template
  * Description: Add filtering based on used template via dropdown on page, post, and custom post types list. Also adds column that shows template names.
  * Plugin URI: http://onetarek.com/my-wordpress-plugins/filter-page-by-template
- * Author: oneTarek
- * Author URI: http://onetarek.com
+ * Author: Matthew Szklarz, oneTarek
+ * Author URI: mszklarz@gmail.com,
  * Version: 2.2
  */
 
